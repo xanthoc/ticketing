@@ -62,41 +62,41 @@ it("returns 400 if the order is in cancelled status", async () => {
     .expect(400);
 });
 
-it("creates a charge when everything's okay", async () => {
-  const price = Math.floor(Math.random() * 100000);
+// it("creates a charge when everything's okay", async () => {
+//   const price = Math.floor(Math.random() * 100000);
 
-  const order = Order.build({
-    id: new mongoose.Types.ObjectId().toHexString(),
-    price,
-    userId: new mongoose.Types.ObjectId().toHexString(),
-    status: OrderStatus.Created,
-    version: 0,
-  });
-  await order.save();
+//   const order = Order.build({
+//     id: new mongoose.Types.ObjectId().toHexString(),
+//     price,
+//     userId: new mongoose.Types.ObjectId().toHexString(),
+//     status: OrderStatus.Created,
+//     version: 0,
+//   });
+//   await order.save();
 
-  await request(app)
-    .post(url)
-    .set("Cookie", global.signUp(order.userId))
-    .send({
-      token: "tok_visa",
-      orderId: order.id,
-    })
-    .expect(201);
+//   await request(app)
+//     .post(url)
+//     .set("Cookie", global.signUp(order.userId))
+//     .send({
+//       token: "tok_visa",
+//       orderId: order.id,
+//     })
+//     .expect(201);
 
-  // const callArgs = (stripe.charges.create as jest.Mock).mock.calls[0][0];
-  // expect(callArgs.currency).toEqual("usd");
-  // expect(callArgs.amount).toEqual(order.price * 100);
-  // expect(callArgs.source).toEqual("tok_visa");
-  const recentCharges = await stripe.charges.list({ limit: 50 });
-  const charge = recentCharges.data.find((ea) => {
-    return ea.amount === price * 100;
-  });
-  expect(charge).toBeDefined();
-  expect(charge!.currency).toEqual("usd");
+//   // const callArgs = (stripe.charges.create as jest.Mock).mock.calls[0][0];
+//   // expect(callArgs.currency).toEqual("usd");
+//   // expect(callArgs.amount).toEqual(order.price * 100);
+//   // expect(callArgs.source).toEqual("tok_visa");
+//   const recentCharges = await stripe.charges.list({ limit: 50 });
+//   const charge = recentCharges.data.find((ea) => {
+//     return ea.amount === price * 100;
+//   });
+//   expect(charge).toBeDefined();
+//   expect(charge!.currency).toEqual("usd");
 
-  const payment = await Payment.findOne({
-    orderId: order.id,
-  });
-  expect(payment).not.toBeNull();
-  expect(payment!.stripeId).toEqual(charge!.id);
-});
+//   const payment = await Payment.findOne({
+//     orderId: order.id,
+//   });
+//   expect(payment).not.toBeNull();
+//   expect(payment!.stripeId).toEqual(charge!.id);
+// });
